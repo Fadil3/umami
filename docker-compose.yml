@@ -3,7 +3,7 @@ services:
   umami:
     image: ghcr.io/umami-software/umami:postgresql-latest
     ports:
-      - "3000:3000"
+      - "2222:3000"
     environment:
       DATABASE_URL: postgresql://umami:umami@db:5432/umami
       DATABASE_TYPE: postgresql
@@ -20,6 +20,8 @@ services:
       retries: 5
   db:
     image: postgres:15-alpine
+    ports:
+      - "5434:5432"
     environment:
       POSTGRES_DB: umami
       POSTGRES_USER: umami

@@ -60,9 +60,9 @@ RUN mv ./.next/routes-manifest.json ./.next/routes-manifest-orig.json
 
 USER nextjs
 
-EXPOSE 3000
+EXPOSE 2222
 
 ENV HOSTNAME=0.0.0.0
-ENV PORT=3000
+ENV PORT=2222
 
 CMD ["pnpm", "start-docker"]

@@ -1,0 +1,113 @@
+# Trigger this pipeline on push events to the main or master branch
+when:
+  branch: [main, master]
+  event: [push]
+
+steps:
+  # -----------------------------------------------------------------
+  # DEBUGGING STEP: Check if the secret is loaded correctly
+  # -----------------------------------------------------------------
+  - name: Debug Secret
+    image: alpine:latest
+    environment:
+      DISCORD_WEBHOOK:
+        from_secret: discord_webhook
+    commands:
+      - |
+        if [ -z "$DISCORD_WEBHOOK" ]; then
+          echo "❌ ERROR: DISCORD_WEBHOOK secret is not loaded or is empty."
+          echo "Please verify the secret in your repository or organization settings."
+          exit 1
+        else
+          echo "✅ SUCCESS: DISCORD_WEBHOOK secret is loaded."
+          echo "Webhook starts with: $(echo $DISCORD_WEBHOOK | cut -c 1-35)..."
+        fi
+
+  # -----------------------------------------------------------------
+  # NOTIFICATION STEP 1: Notify that the build has started
+  # -----------------------------------------------------------------
+  - name: Notify Build Started
+    image: curlimages/curl:latest
+    environment:
+      DISCORD_WEBHOOK:
+        from_secret: discord_webhook
+    # This step runs at the very beginning
+    commands:
+      - |
+        curl -X POST -H "Content-Type: application/json" \
+        -d '{
+          "username": "Woodpecker CI",
+          "avatar_url": "https://woodpecker-ci.org/logo.svg",
+          "embeds": [{
+            "title": "⏳ Build Started",
+            "description": "Build [#${CI_BUILD_NUMBER}](${CI_BUILD_LINK}) on branch `${CI_COMMIT_BRANCH}` has started.\n\nCommit [${CI_COMMIT_SHA:0:7}](${CI_COMMIT_LINK}) by **${CI_COMMIT_AUTHOR}**: _${CI_COMMIT_MESSAGE}_",
+            "color": 3447003,
+            "timestamp": "'""$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")"'""
+          }]
+        }' \
+        $DISCORD_WEBHOOK
+
+  # -----------------------------------------------------------------
+  # STEP: Build and deploy the application
+  # -----------------------------------------------------------------
+  - name: Build and Deploy
+    image: docker
+    commands:
+      - echo "Building and deploying services with docker-compose..."
+      - docker compose up -d --build
+      - echo "Deployment complete!"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    # This step will run after the "Notify Build Started" step
+
+  # -----------------------------------------------------------------
+  # NOTIFICATION STEP 2: Notify on SUCCESS
+  # -----------------------------------------------------------------
+  - name: Notify on Success
+    image: curlimages/curl:latest
+    environment:
+      DISCORD_WEBHOOK:
+        from_secret: discord_webhook
+    # This step only runs if all previous steps were successful
+    when:
+      status: [success]
+    commands:
+      - |
+        curl -X POST -H "Content-Type: application/json" \
+        -d '{
+          "username": "Woodpecker CI",
+          "avatar_url": "https://woodpecker-ci.org/logo.svg",
+          "embeds": [{
+            "title": "✅ Build Succeeded",
+            "description": "Build [#${CI_BUILD_NUMBER}](${CI_BUILD_LINK}) on branch `${CI_COMMIT_BRANCH}` completed successfully.",
+            "color": 3066993,
+            "timestamp": "'""$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")"'""
+          }]
+        }' \
+        $DISCORD_WEBHOOK
+
+  # -----------------------------------------------------------------
+  # NOTIFICATION STEP 3: Notify on FAILURE
+  # -----------------------------------------------------------------
+  - name: Notify on Failure
+    image: curlimages/curl:latest
+    environment:
+      DISCORD_WEBHOOK:
+        from_secret: discord_webhook
+    # This step only runs if any previous step failed
+    when:
+      status: [failure]
+    commands:
+      - |
+        curl -X POST -H "Content-Type: application/json" \
+        -d '{
+          "username": "Woodpecker CI",
+          "avatar_url": "https://woodpecker-ci.org/logo.svg",
+          "embeds": [{
+            "title": "❌ Build Failed",
+            "description": "Build [#${CI_BUILD_NUMBER}](${CI_BUILD_LINK}) on branch `${CI_COMMIT_BRANCH}` failed. Please check the logs.",
+            "color": 15158332,
+            "timestamp": "'""$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")"'""
+          }]
+        }' \
+        $DISCORD_WEBHOOK
