@@ -36,16 +36,16 @@ steps:
       - |
         TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
         curl -X POST -H "Content-Type: application/json" \
-        -d '{
-          "username": "Woodpecker CI",
-          "avatar_url": "https://woodpecker-ci.org/logo.svg",
-          "embeds": [{
-            "title": "⏳ Build Started",
-            "description": "Build [#${CI_BUILD_NUMBER}](${CI_BUILD_LINK}) on branch `${CI_COMMIT_BRANCH}` has started.\n\nCommit [${CI_COMMIT_SHA:0:7}](${CI_COMMIT_LINK}) by **${CI_COMMIT_AUTHOR}**: _${CI_COMMIT_MESSAGE}_",
-            "color": 3447003,
-            "timestamp": "'"$TIMESTAMP"'"
+        -d "{
+          \"username\": \"Woodpecker CI\",
+          \"avatar_url\": \"https://avatars.githubusercontent.com/u/84780935?s=200&v=4\",
+          \"embeds\": [{
+            \"title\": \"⏳ Build Started\",
+            \"description\": \"Build [#${CI_BUILD_NUMBER}](${CI_BUILD_LINK}) on branch `${CI_COMMIT_BRANCH}` has started.\n\nCommit [${CI_COMMIT_SHA:0:7}](${CI_COMMIT_LINK}) by **${CI_COMMIT_AUTHOR}**: _${CI_COMMIT_MESSAGE}_\",
+            \"color\": 3447003,
+            \"timestamp\": \"$TIMESTAMP\"
           }]
-        }' \
+        }" \
         $DISCORD_WEBHOOK
 
   # -----------------------------------------------------------------
@@ -76,16 +76,16 @@ steps:
       - |
         TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
         curl -X POST -H "Content-Type: application/json" \
-        -d '{
-          "username": "Woodpecker CI",
-          "avatar_url": "https://woodpecker-ci.org/logo.svg",
-          "embeds": [{
-            "title": "✅ Build Succeeded",
-            "description": "Build [#${CI_BUILD_NUMBER}](${CI_BUILD_LINK}) on branch `${CI_COMMIT_BRANCH}` completed successfully.",
-            "color": 3066993,
-            "timestamp": "'"$TIMESTAMP"'"
+        -d "{
+          \"username\": \"Woodpecker CI\",
+          \"avatar_url\": \"https://avatars.githubusercontent.com/u/84780935?s=200&v=4\",
+          \"embeds\": [{
+            \"title\": \"✅ Build Succeeded\",
+            \"description\": \"Build [#${CI_BUILD_NUMBER}](${CI_BUILD_LINK}) on branch `${CI_COMMIT_BRANCH}` completed successfully.\",
+            \"color\": 3066993,
+            \"timestamp\": \"$TIMESTAMP\"
           }]
-        }' \
+        }" \
         $DISCORD_WEBHOOK
 
   # -----------------------------------------------------------------
@@ -103,14 +103,14 @@ steps:
       - |
         TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
         curl -X POST -H "Content-Type: application/json" \
-        -d '{
+        -d "{
           "username": "Woodpecker CI",
-          "avatar_url": "https://woodpecker-ci.org/logo.svg",
+          "avatar_url": "https://avatars.githubusercontent.com/u/84780935?s=200&v=4",
           "embeds": [{
             "title": "❌ Build Failed",
             "description": "Build [#${CI_BUILD_NUMBER}](${CI_BUILD_LINK}) on branch `${CI_COMMIT_BRANCH}` failed. Please check the logs.",
             "color": 15158332,
-            "timestamp": "'"$TIMESTAMP"'"
+            "timestamp": "$TIMESTAMP"
           }]
-        }' \
+        }" \
         $DISCORD_WEBHOOK
