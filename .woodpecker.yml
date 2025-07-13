@@ -34,6 +34,7 @@ steps:
     # This step runs at the very beginning
     commands:
       - |
+        TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
         curl -X POST -H "Content-Type: application/json" \
         -d '{
           "username": "Woodpecker CI",
@@ -42,7 +43,7 @@ steps:
             "title": "⏳ Build Started",
             "description": "Build [#${CI_BUILD_NUMBER}](${CI_BUILD_LINK}) on branch `${CI_COMMIT_BRANCH}` has started.\n\nCommit [${CI_COMMIT_SHA:0:7}](${CI_COMMIT_LINK}) by **${CI_COMMIT_AUTHOR}**: _${CI_COMMIT_MESSAGE}_",
             "color": 3447003,
-            "timestamp": "'""$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")"'""
+            "timestamp": "'"$TIMESTAMP"'"
           }]
         }' \
         $DISCORD_WEBHOOK
@@ -73,6 +74,7 @@ steps:
       status: [success]
     commands:
       - |
+        TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
         curl -X POST -H "Content-Type: application/json" \
         -d '{
           "username": "Woodpecker CI",
@@ -81,7 +83,7 @@ steps:
             "title": "✅ Build Succeeded",
             "description": "Build [#${CI_BUILD_NUMBER}](${CI_BUILD_LINK}) on branch `${CI_COMMIT_BRANCH}` completed successfully.",
             "color": 3066993,
-            "timestamp": "'""$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")"'""
+            "timestamp": "'"$TIMESTAMP"'"
           }]
         }' \
         $DISCORD_WEBHOOK
@@ -99,6 +101,7 @@ steps:
       status: [failure]
     commands:
       - |
+        TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
         curl -X POST -H "Content-Type: application/json" \
         -d '{
           "username": "Woodpecker CI",
@@ -107,7 +110,7 @@ steps:
             "title": "❌ Build Failed",
             "description": "Build [#${CI_BUILD_NUMBER}](${CI_BUILD_LINK}) on branch `${CI_COMMIT_BRANCH}` failed. Please check the logs.",
             "color": 15158332,
-            "timestamp": "'""$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")"'""
+            "timestamp": "'"$TIMESTAMP"'"
           }]
         }' \
         $DISCORD_WEBHOOK
