@@ -1,7 +1,7 @@
 # Trigger this pipeline on push events to the main or master branch
 when:
   branch: [main, master]
-  event: [push]
+  event: [push,manual]
 
 steps:
   # -----------------------------------------------------------------
